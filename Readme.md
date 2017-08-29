@@ -5,6 +5,7 @@ A small 2D physics game made using the amazing [Godot 2.1](https://godotengine.o
 
 I followed along this excellent [youtube tutorial](https://www.youtube.com/playlist?list=PLv3l-oZCXaql20IlPe7gfBEzomnPSLekY) and used a lot of the same patterns.
 
+Available for free on the [Google Play Store](https://play.google.com/store/apps/details?id=org.godotengine.towermaster).
 
 ### License
 
