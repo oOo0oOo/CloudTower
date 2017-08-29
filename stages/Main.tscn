@@ -1,0 +1,435 @@
+[gd_scene load_steps=23 format=1]
+
+[ext_resource path="res://scenes/main.gd" type="Script" id=1]
+[ext_resource path="res://sprites/background.png" type="Texture" id=2]
+[ext_resource path="res://scenes/high_score.tscn" type="PackedScene" id=3]
+[ext_resource path="res://scripts/high_score.gd" type="Script" id=4]
+[ext_resource path="res://scenes/borders.tscn" type="PackedScene" id=5]
+[ext_resource path="res://scenes/spawner_ground.tscn" type="PackedScene" id=6]
+[ext_resource path="res://scenes/spawner_platform.tscn" type="PackedScene" id=7]
+[ext_resource path="res://scenes/dude.tscn" type="PackedScene" id=8]
+[ext_resource path="res://scripts/camera.gd" type="Script" id=9]
+[ext_resource path="res://fonts/lobster.ttf" type="DynamicFontData" id=10]
+[ext_resource path="res://sprites/btn_restart.png" type="Texture" id=11]
+[ext_resource path="res://sprites/btn_back.png" type="Texture" id=12]
+[ext_resource path="res://sprites/btn_play.png" type="Texture" id=13]
+
+[sub_resource type="DynamicFont" id=1]
+
+font/size = 90
+font/use_mipmaps = false
+font/use_filter = false
+font/font = ExtResource( 10 )
+
+[sub_resource type="GDScript" id=2]
+
+script/source = "extends Label
+
+func _ready():
+	game.connect(\"score_current_changed\", self, \"_on_score_current_changed\")
+	
+	var dude = utils.get_main_node().get_node(\"dude\")
+	if dude:
+		dude.connect(\"failed\", self, \"_on_failed\")
+
+func _on_failed():
+	hide()
+
+func _on_score_current_changed():
+	set_text(str(game.score_current))"
+
+[sub_resource type="GDScript" id=3]
+
+resource/name = "btn_restart"
+script/source = "extends TextureButton
+
+func _ready():
+	var dude = utils.get_main_node().get_node(\"dude\")
+	if dude:
+		dude.connect(\"failed\", self, \"_on_failed\")
+
+func _pressed():
+	if game.score_current > game.score_best:
+		game.score_best = game.score_current
+	stage_manager.change_stage(stage_manager.STAGE_GAME)
+	
+func _on_failed():
+	hide()"
+
+[sub_resource type="GDScript" id=4]
+
+resource/name = "btn_return"
+script/source = "extends TextureButton
+
+
+func _ready():
+	var dude = utils.get_main_node().get_node(\"dude\")
+	if dude:
+		dude.connect(\"failed\", self, \"_on_failed\")
+
+func _pressed():
+	if game.score_current > game.score_best:
+		game.score_best = game.score_current
+	stage_manager.change_stage(stage_manager.STAGE_MENU)
+	
+func _on_failed():
+	hide()"
+
+[sub_resource type="GDScript" id=5]
+
+script/source = "extends Container
+
+var is_shown = false
+
+func _ready():
+	var dude = utils.get_main_node().get_node(\"dude\")
+	if dude:
+		dude.connect(\"failed\", self, \"_on_failed\")
+
+func _on_failed():
+	if is_shown: return
+	
+	is_shown = true
+	# Set score
+	if game.score_current > game.score_best:
+		game.score_best = game.score_current
+	var score = get_node(\"score_container\").get_node(\"score_label\")
+	score.set_text(str(game.score_current)+\"\\n\"+str(game.score_best))
+	
+	# Play animation
+	get_node(\"anim\").play(\"show\")"
+
+[sub_resource type="DynamicFont" id=6]
+
+font/size = 135
+font/use_mipmaps = false
+font/use_filter = false
+font/font = ExtResource( 10 )
+
+[sub_resource type="DynamicFont" id=7]
+
+font/size = 80
+font/use_mipmaps = false
+font/use_filter = false
+font/font = ExtResource( 10 )
+
+[sub_resource type="GDScript" id=8]
+
+script/source = "extends TextureButton
+
+
+func _ready():
+	connect(\"pressed\", self, \"_on_pressed\")
+	
+func _on_pressed():
+	stage_manager.change_stage(stage_manager.STAGE_GAME)
+"
+
+[sub_resource type="Animation" id=9]
+
+length = 1.0
+loop = false
+step = 0.1
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:visibility/visible")
+tracks/0/interp = 1
+tracks/0/imported = false
+tracks/0/keys = {
+"times": FloatArray( 0 ),
+"transitions": FloatArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("gameover_label:visibility/opacity")
+tracks/1/interp = 1
+tracks/1/imported = false
+tracks/1/keys = {
+"times": FloatArray( 0, 0.7 ),
+"transitions": FloatArray( 1, 1 ),
+"update": 0,
+"values": [ 0.0, 1.0 ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("gameover_label:rect/pos")
+tracks/2/interp = 1
+tracks/2/imported = false
+tracks/2/keys = {
+"times": FloatArray( 0, 0.7 ),
+"transitions": FloatArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 140 ), Vector2( 0, 180 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("score_container:rect/pos")
+tracks/3/interp = 1
+tracks/3/imported = false
+tracks/3/keys = {
+"times": FloatArray( 0, 1 ),
+"transitions": FloatArray( 0.25, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 1280 ), Vector2( 0, 480 ) ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("btn_play:visibility/opacity")
+tracks/4/interp = 1
+tracks/4/imported = false
+tracks/4/keys = {
+"times": FloatArray( 0, 0.4, 1 ),
+"transitions": FloatArray( 1, 1, 1 ),
+"update": 0,
+"values": [ 0.0, 0.0, 1.0 ]
+}
+
+[node name="main" type="Node"]
+
+script/script = ExtResource( 1 )
+
+[node name="background" type="CanvasLayer" parent="."]
+
+layer = -1
+offset = Vector2( 0, 0 )
+rotation = 0.0
+scale = Vector2( 1, 1 )
+
+[node name="bg_tex" type="TextureFrame" parent="background"]
+
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 0.0
+margin/top = 0.0
+margin/right = 720.0
+margin/bottom = 1280.0
+texture = ExtResource( 2 )
+stretch_mode = 0
+
+[node name="high_score" parent="." instance=ExtResource( 3 )]
+
+visibility/visible = false
+script/script = ExtResource( 4 )
+
+[node name="borders" parent="." instance=ExtResource( 5 )]
+
+transform/pos = Vector2( 360, 1070 )
+
+[node name="spawner_ground" parent="." instance=ExtResource( 6 )]
+
+transform/pos = Vector2( 0, 1050 )
+
+[node name="spawner_platform" parent="." instance=ExtResource( 7 )]
+
+[node name="dude" parent="." instance=ExtResource( 8 )]
+
+transform/pos = Vector2( 360, 1050 )
+friction = 0.7
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+anchor_mode = 0
+rotating = false
+current = true
+zoom = Vector2( 1, 1 )
+limit/left = -10000000
+limit/top = -10000000
+limit/right = 10000000
+limit/bottom = 10000000
+drag_margin/h_enabled = true
+drag_margin/v_enabled = true
+smoothing/enable = false
+smoothing/speed = 5.0
+drag_margin/left = 0.2
+drag_margin/top = 0.2
+drag_margin/right = 0.2
+drag_margin/bottom = 0.2
+script/script = ExtResource( 9 )
+
+[node name="hud" type="CanvasLayer" parent="."]
+
+layer = 1
+offset = Vector2( 0, 0 )
+rotation = 0.0
+scale = Vector2( 1, 1 )
+
+[node name="lvl_score" type="Label" parent="hud"]
+
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = 0.0
+margin/top = 21.0
+margin/right = 720.0
+margin/bottom = 133.0
+custom_fonts/font = SubResource( 1 )
+custom_colors/font_color = Color( 0.820312, 0.877869, 1, 1 )
+custom_colors/font_color_shadow = Color( 0.123047, 0.233276, 0.375, 1 )
+custom_constants/shadow_offset_x = 7
+custom_constants/shadow_offset_y = 7
+text = "0"
+align = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+script/script = SubResource( 2 )
+
+[node name="btn_restart" type="TextureButton" parent="hud"]
+
+rect/scale = Vector2( 0.3, 0.3 )
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 600.0
+margin/top = 40.0
+margin/right = 856.0
+margin/bottom = 296.0
+toggle_mode = false
+enabled_focus_mode = 2
+shortcut = null
+textures/normal = ExtResource( 11 )
+params/resize_mode = 0
+params/stretch_mode = 0
+script/script = SubResource( 3 )
+
+[node name="btn_return" type="TextureButton" parent="hud"]
+
+rect/scale = Vector2( 0.25, 0.25 )
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 45.0
+margin/top = 48.0
+margin/right = 301.0
+margin/bottom = 304.0
+toggle_mode = false
+enabled_focus_mode = 2
+shortcut = null
+textures/normal = ExtResource( 12 )
+params/resize_mode = 0
+params/stretch_mode = 0
+script/script = SubResource( 4 )
+
+[node name="gameover_screen" type="Container" parent="hud"]
+
+visibility/visible = false
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 0.0
+margin/top = 0.0
+margin/right = 40.0
+margin/bottom = 40.0
+script/script = SubResource( 5 )
+
+[node name="gameover_label" type="Label" parent="hud/gameover_screen"]
+
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = 0.0
+margin/top = 180.0
+margin/right = 720.0
+margin/bottom = 349.0
+custom_fonts/font = SubResource( 6 )
+custom_colors/font_color = Color( 0.933594, 0.305652, 0.0875244, 1 )
+custom_colors/font_color_shadow = Color( 0.0522156, 0.148924, 0.226562, 0.863373 )
+custom_constants/shadow_offset_x = 10
+custom_constants/shadow_offset_y = 10
+text = "Game Over"
+align = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+
+[node name="score_container" type="Container" parent="hud/gameover_screen"]
+
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 0.0
+margin/top = 480.0
+margin/right = 40.0
+margin/bottom = 520.0
+
+[node name="score_legend" type="Label" parent="hud/gameover_screen/score_container"]
+
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = 90.0
+margin/top = 0.0
+margin/right = 390.0
+margin/bottom = 251.0
+custom_fonts/font = SubResource( 7 )
+custom_colors/font_color = Color( 0.203705, 0.326139, 0.585938, 1 )
+custom_colors/font_color_shadow = Color( 0.549316, 0.719147, 0.9375, 1 )
+custom_constants/shadow_offset_x = 3
+custom_constants/line_spacing = 35
+custom_constants/shadow_offset_y = 2
+text = "Score
+Best"
+align = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+
+[node name="score_label" type="Label" parent="hud/gameover_screen/score_container"]
+
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = 385.0
+margin/top = 0.0
+margin/right = 585.0
+margin/bottom = 251.0
+custom_fonts/font = SubResource( 7 )
+custom_colors/font_color = Color( 0.203705, 0.326139, 0.585938, 1 )
+custom_colors/font_color_shadow = Color( 0.549316, 0.719147, 0.9375, 1 )
+custom_constants/shadow_offset_x = 3
+custom_constants/line_spacing = 35
+custom_constants/shadow_offset_y = 2
+text = "16
+31"
+align = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+
+[node name="btn_play" type="TextureButton" parent="hud/gameover_screen"]
+
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 232.0
+margin/top = 852.0
+margin/right = 488.0
+margin/bottom = 1108.0
+toggle_mode = false
+enabled_focus_mode = 2
+shortcut = null
+textures/normal = ExtResource( 13 )
+params/resize_mode = 0
+params/stretch_mode = 0
+script/script = SubResource( 8 )
+
+[node name="anim" type="AnimationPlayer" parent="hud/gameover_screen"]
+
+playback/process_mode = 1
+playback/default_blend_time = 0.0
+root/root = NodePath("..")
+anims/show = SubResource( 9 )
+playback/active = true
+playback/speed = 1.5
+blend_times = [  ]
+autoplay = ""
+
+
